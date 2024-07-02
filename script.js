@@ -1,4 +1,4 @@
-require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Legend"], (Map, MapView, FeatureLayer, Legend) => {
+require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/widgets/Legend", "esri/widgets/BasemapGallery", "esri/widgets/Expand"],(Map, MapView, FeatureLayer, Legend, BasemapGallery, Expand) => {
   /********************
   initialize map
   ********************/
@@ -12,8 +12,20 @@ require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/wid
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    zoom: 4,
-    center: [-98.555183, 39.809860]
+    zoom: 3,
+    center: [-100, 40] // center of lower 48
+  });
+
+  const basemapExpand = new Expand({
+    view,
+    content: new BasemapGallery({view: view}),
+    expandIcon: "basemap"
+  });
+
+  const legendExpand = new Expand({
+    view,
+    content: new Legend({view: view}),
+    expandIcon: "legend"
   });
 
   /********************
@@ -23,14 +35,13 @@ require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/wid
   const polygonsURL = "https://services9.arcgis.com/RHVPKKiFTONKtxq3/arcgis/rest/services/USA_Wildfires_v1/FeatureServer/1";
 
   const points = new FeatureLayer({url: pointsURL});
-
   const polygons = new FeatureLayer({url: polygonsURL});
 
   /********************
   initialize map legend
   ********************/
-  let legend = new Legend({
-    view: view
+  const legend = new Legend({
+    view: view,
   });
 
   /********************
@@ -38,5 +49,6 @@ require(["esri/Map", "esri/views/MapView", "esri/layers/FeatureLayer", "esri/wid
   ********************/
   map.add(polygons);
   map.add(points);
-  view.ui.add(legend, "bottom-right");
+  view.ui.add(basemapExpand, "top-right");
+  view.ui.add(legendExpand, "top-right");
 });
