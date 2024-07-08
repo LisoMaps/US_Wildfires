@@ -33,7 +33,7 @@ require(["esri/Map",
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    zoom: 4,
+    zoom: 3,
     center: [-98, 39] // lon, lat ... center of lower 48
   });
 
@@ -45,14 +45,6 @@ require(["esri/Map",
     content: new BasemapGallery({view: view}),
     expandIcon: "basemap",
     expandTooltip: "Basemap Gallery"
-  });
-
-  const legendExpand = new Expand({
-    view,
-    content: new Legend({view: view}),
-    expandIcon: "legend",
-    expandTooltip: "Legend",
-    expanded: false
   });
 
   const homeWidget = new Home({
@@ -132,9 +124,41 @@ require(["esri/Map",
 
   const points = new FeatureLayer({
     url: pointsURL,
-    popupTemplate: popupTemplate
+    popupTemplate: popupTemplate,
+    title: ""
   });
   const polygons = new FeatureLayer({url: polygonsURL});
+
+
+  /********************
+  initialize legend widget
+  ********************/
+  const legend = new Legend({
+    view: view,
+    layerInfos: [
+      {
+        layer: points,
+        title: "US Wildfire Incidents (Acres)"
+      },
+      
+      {
+        layer: polygons,
+        title: "Wildfire Perimeters"
+      }
+    ],
+    title: false
+  });
+
+  
+
+  const legendExpand = new Expand({
+    view,
+    content: legend,
+    expandIcon: "legend",
+    expandTooltip: "Legend",
+    expanded: true
+  });
+
 
   /********************
   initialize search widget
