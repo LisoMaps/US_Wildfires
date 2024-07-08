@@ -9,7 +9,7 @@ require(["esri/Map",
   "esri/widgets/Home",
   "esri/widgets/Search"
 ],(Map, MapView, FeatureLayer, Legend, Basemap, BasemapGallery, VectorTileLayer, Expand, Home, Search) => {
-  
+
   const outdoorsLayer = new VectorTileLayer({
     portalItem: {
       id: "659e7c1b1e374f6c8a89eefe17b23380"
@@ -74,6 +74,36 @@ require(["esri/Map",
       }
       return "Not Available";
     `
+
+  };
+  // wildfire type
+  const typeExpression = {
+    name: "IncidentTypeCategory",
+    title: "Incident Type Category",
+    expression:
+    `
+      var Type = $feature.IncidentTypeCategory
+
+      When (Type == 'RX', "RX - Prescribed Fire",
+      Type == 'WF', "WF - Wildfire",
+      Type == 'IC', "IC - Incident Complex",
+      "")
+    `
+  };
+
+  // daily/discovery acres
+  const acreExpression = {
+    name: "Acreage",
+    title: "Acreage",
+    expression:
+    `
+      var DailyAcres = ! IsEmpty($feature.DailyAcres)
+      var DiscoveryAcres = ! IsEmpty($feature.DiscoveryAcres)
+
+      If (DailyAcres) Return text($feature["DailyAcres"],'#,###.##') 
+      If (DiscoveryAcres) Return text($feature["DiscoveryAcres"],'#,###.##') 
+      Return "Not Available"
+    `
   };
 
   /********************
@@ -83,9 +113,15 @@ require(["esri/Map",
     title: '"{IncidentName}" incident', // Custom title format
     content: [{
       type: "text",
-      text: "<b>Discovered on:</b> {FireDiscoveryDateTime}<br><b>Percent Contained:</b> {expression/PercentContained}<br><br><i>Current as of:</i> {ModifiedOnDateTime}"
+      text:
+      `<b>TYPE:</b> {expression/IncidentTypeCategory}<br>
+      <b>Discovered:</b> {FireDiscoveryDateTime}<br>
+      <b>Acres burned:</b> {expression/Acreage}<br>
+      <b>Percent Contained:</b> {expression/PercentContained}<br>
+      <br><i>Current as of: {ModifiedOnDateTime}</i>
+      `
     }],
-    expressionInfos: [percentContainedExpression]
+    expressionInfos: [percentContainedExpression, typeExpression, acreExpression]
   };
 
   /********************
