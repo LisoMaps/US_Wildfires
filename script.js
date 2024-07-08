@@ -52,7 +52,7 @@ require(["esri/Map",
     content: new Legend({view: view}),
     expandIcon: "legend",
     expandTooltip: "Legend",
-    expanded: true
+    expanded: false
   });
 
   const homeWidget = new Home({
@@ -110,7 +110,7 @@ require(["esri/Map",
   define pop-up template
   ********************/
   const popupTemplate = {
-    title: '"{IncidentName}" incident', // Custom title format
+    title: '"{IncidentName}" Incident', // pop-up title
     content: [{
       type: "text",
       text:
@@ -152,7 +152,7 @@ require(["esri/Map",
   });
 
   // embed the Search widget within an expand element
-  const expandSearch = new Expand({
+  const searchExpand = new Expand({
     view: view,
     content: searchWidget, // Embed the Search widget
     expandIconClass: "esri-icon-search", // Icon for the expand button
@@ -160,12 +160,33 @@ require(["esri/Map",
   });
 
   /********************
+  expand one widget at a time
+  ********************/
+  const expandWidgets = [basemapExpand, legendExpand, searchExpand];
+
+  function collapseOthers(expandedWidget) {
+    expandWidgets.forEach(widget => {
+      if (widget !== expandedWidget && widget.expanded) {
+        widget.collapse();
+      }
+    });
+  }
+
+  expandWidgets.forEach(widget => {
+    widget.watch('expanded', function(expanded) {
+      if (expanded) {
+        collapseOthers(this);
+      }
+    });
+  });
+
+  /********************
   add US wildfire FL's and widgets to map/map view
   ********************/
   map.add(polygons);
   map.add(points);
-  view.ui.add(expandSearch, "top-right");
-  view.ui.add(homeWidget, "top-right");
-  view.ui.add(basemapExpand, "top-right");
-  view.ui.add(legendExpand, "top-right");
+  view.ui.add(searchExpand, "top-right", 0);
+  view.ui.add(homeWidget, "top-right", 0);
+  view.ui.add(basemapExpand, "top-right", 1);
+  view.ui.add(legendExpand, "top-right", 2);
 });
