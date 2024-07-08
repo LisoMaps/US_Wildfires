@@ -33,8 +33,8 @@ require(["esri/Map",
   const view = new MapView({
     container: "viewDiv",
     map: map,
-    zoom: 3,
-    center: [-100, 40] // center of lower 48
+    zoom: 4,
+    center: [-98, 39] // lon, lat ... center of lower 48
   });
 
   /********************
@@ -148,7 +148,10 @@ require(["esri/Map",
       exactMatch: false, // Whether to search exact matches only
       outFields: ["*"] // Additional fields to retrieve
     }],
-    includeDefaultSources: false // Exclude default search sources like ArcGIS Online
+    includeDefaultSources: false, // Exclude default search sources like ArcGIS Online
+    suggestionsEnabled: true,
+    minSuggestCharacters: 1,
+    maxSuggestions: 10
   });
 
   // embed the Search widget within an expand element
@@ -162,7 +165,7 @@ require(["esri/Map",
   /********************
   expand one widget at a time
   ********************/
-  const expandWidgets = [basemapExpand, legendExpand, searchExpand];
+  const expandWidgets = [basemapExpand, legendExpand];
 
   function collapseOthers(expandedWidget) {
     expandWidgets.forEach(widget => {
@@ -183,10 +186,11 @@ require(["esri/Map",
   /********************
   add US wildfire FL's and widgets to map/map view
   ********************/
+  view.ui.remove("zoom");
   map.add(polygons);
   map.add(points);
-  view.ui.add(searchExpand, "top-right", 0);
-  view.ui.add(homeWidget, "top-right", 0);
-  view.ui.add(basemapExpand, "top-right", 1);
-  view.ui.add(legendExpand, "top-right", 2);
+  view.ui.add(searchExpand, "top-left");
+  view.ui.add(homeWidget, "top-right");
+  view.ui.add(basemapExpand, "top-right");
+  view.ui.add(legendExpand, "top-right");
 });
